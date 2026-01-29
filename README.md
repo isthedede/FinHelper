@@ -210,7 +210,6 @@ This project is licensed under the MIT License. See the LICENSE file for details
 - Specific financial goals (e.g., "Save $5,000 for vacation")
 - Bank statement import (CSV/OFX)
 - Month-to-month comparison mode
-- Notifications and reminders
 
 ---
 

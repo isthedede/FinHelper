@@ -9,6 +9,8 @@ import EditableCell from '../components/EditableCell'
 import InvestmentModal from '../components/InvestmentModal'
 import DebtModal from '../components/DebtModal'
 import ConfirmModal from '../components/ConfirmModal'
+import SubcategoryModal from '../components/SubcategoryModal'
+import SubcategoryRow from '../components/SubcategoryRow'
 import './BudgetPage.css'
 
 const BudgetPage = () => {
@@ -36,6 +38,9 @@ const BudgetPage = () => {
     updateDebt,
     removeDebt,
     toggleDebtPaid,
+    addSubcategory,
+    updateSubcategory,
+    removeSubcategory,
   } = useFinance()
   
   // Modal state
@@ -91,6 +96,11 @@ const BudgetPage = () => {
   const [isDebtConfirmOpen, setIsDebtConfirmOpen] = useState(false)
   const [debtToDelete, setDebtToDelete] = useState(null)
   
+  // Subcategory state
+  const [isSubcategoryModalOpen, setIsSubcategoryModalOpen] = useState(false)
+  const [selectedCategory, setSelectedCategory] = useState(null)
+  const [expandedCategories, setExpandedCategories] = useState({})
+  
   // Debt handlers
   const handleAddDebt = () => {
     setEditingDebt(null)
@@ -130,6 +140,35 @@ const BudgetPage = () => {
     setDebtToDelete(null)
   }
   
+  // Subcategory handlers
+  const toggleCategory = (categoryId) => {
+    setExpandedCategories(prev => ({
+      ...prev,
+      [categoryId]: !prev[categoryId]
+    }))
+  }
+  
+  const handleAddSubcategory = (category) => {
+    setSelectedCategory(category)
+    setIsSubcategoryModalOpen(true)
+  }
+  
+  const handleSaveSubcategory = (data) => {
+    if (selectedCategory) {
+      addSubcategory(selectedCategory.id, data)
+    }
+    setIsSubcategoryModalOpen(false)
+    setSelectedCategory(null)
+  }
+  
+  const handleUpdateSubcategory = (categoryId, subcategoryId, updates) => {
+    updateSubcategory(categoryId, subcategoryId, updates)
+  }
+  
+  const handleRemoveSubcategory = (categoryId, subcategoryId) => {
+    removeSubcategory(categoryId, subcategoryId)
+  }
+  
   return (
     <div className="page budget-page">
       <Header />
@@ -160,29 +199,83 @@ const BudgetPage = () => {
                   const spent = cat.id === 'liberdade' ? totalInvestments : (categorySpent[cat.id] || 0)
                   const utilization = calculateUtilization(spent, budget)
                   const percentOfTotal = monthlyIncome > 0 ? (spent / monthlyIncome) * 100 : 0
+                  const isExpanded = expandedCategories[cat.id]
+                  const hasSubcategories = cat.subcategories && cat.subcategories.length > 0
                   
                   let statusClass = 'status-ok'
                   if (utilization > 100) statusClass = 'status-danger'
                   else if (utilization > 80) statusClass = 'status-warning'
                   
                   return (
-                    <div key={cat.id} className={`table-row ${statusClass}`}>
-                      <div className="row-label">
-                        <span className="cat-color" style={{ backgroundColor: cat.color }} />
-                        {cat.name}
+                    <div key={cat.id} className="category-wrapper">
+                      {/* Main category row */}
+                      <div className={`table-row ${statusClass}`}>
+                        {/* Category name with chevron inside */}
+                        <div 
+                          className="row-label clickable"
+                          onClick={() => toggleCategory(cat.id)}
+                          title={isExpanded ? "Recolher" : "Expandir"}
+                        >
+                          <button className="chevron-inline">
+                            {isExpanded ? '▼' : '▶'}
+                          </button>
+                          <span className="cat-color" style={{ backgroundColor: cat.color }} />
+                          {cat.name}
+                        </div>
+                        
+                        {/* Valor Gasto - read-only if has subcategories or is Liberdade */}
+                        {cat.id === 'liberdade' || hasSubcategories ? (
+                          <div className="non-editable-cell">{formatCurrency(spent)}</div>
+                        ) : (
+                          <EditableCell 
+                            value={spent}
+                            onSave={updateCategorySpent}
+                            categoryId={cat.id}
+                          />
+                        )}
+                        
+                        <div>{formatCurrency(budget)}</div>
+                        <div className="utilization">{utilization.toFixed(1)}%</div>
+                        <div>{percentOfTotal.toFixed(1)}%</div>
                       </div>
-                      {cat.id === 'liberdade' ? (
-                        <div className="non-editable-cell">{formatCurrency(spent)}</div>
-                      ) : (
-                        <EditableCell 
-                          value={spent}
-                          onSave={updateCategorySpent}
-                          categoryId={cat.id}
-                        />
+                      
+                      {/* Expanded subcategories row (full width) */}
+                      {isExpanded && (
+                        <div className="expanded-row">
+                          <div className="subcat-box">
+                            {/* Subcategories list */}
+                            {hasSubcategories && (
+                              <div className="subcat-list">
+                                {cat.subcategories.map(sub => (
+                                  <SubcategoryRow
+                                    key={sub.id}
+                                    subcategory={sub}
+                                    onUpdate={(subId, updates) => handleUpdateSubcategory(cat.id, subId, updates)}
+                                    onDelete={(subId) => handleRemoveSubcategory(cat.id, subId)}
+                                  />
+                                ))}
+                              </div>
+                            )}
+                            
+                            {/* Footer with button and subtotal */}
+                            <div className="subcat-footer">
+                              <button 
+                                className="btn btn-secondary btn-sm"
+                                onClick={() => handleAddSubcategory(cat)}
+                              >
+                                + Adicionar subcategoria
+                              </button>
+                              
+                              {hasSubcategories && (
+                                <div className="subcat-subtotal">
+                                  <span>Subtotal:</span>
+                                  <span className="subtotal-value">{formatCurrency(spent)}</span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
                       )}
-                      <div>{formatCurrency(budget)}</div>
-                      <div className="utilization">{utilization.toFixed(1)}%</div>
-                      <div>{percentOfTotal.toFixed(1)}%</div>
                     </div>
                   )
                 })}
@@ -473,6 +566,14 @@ const BudgetPage = () => {
           onConfirm={confirmDeleteDebt}
           title="Excluir Dívida"
           message={`Tem certeza que deseja excluir "${debtToDelete?.name}"?`}
+        />
+        
+        {/* Subcategory Modal */}
+        <SubcategoryModal
+          isOpen={isSubcategoryModalOpen}
+          onClose={() => setIsSubcategoryModalOpen(false)}
+          onSave={handleSaveSubcategory}
+          categoryName={selectedCategory?.name || ''}
         />
       </main>
     </div>

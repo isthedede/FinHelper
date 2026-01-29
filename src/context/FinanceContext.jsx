@@ -20,12 +20,12 @@ export const useFinance = () => {
 
 // Default categories with predefined percentages (recommended values)
 const DEFAULT_CATEGORIES = [
-  { id: 'custos-fixos', name: 'Custos fixos', color: '#4a90e2', percentage: 35 },
-  { id: 'conforto', name: 'Conforto', color: '#00d4aa', percentage: 15 },
-  { id: 'metas', name: 'Metas', color: '#f5d547', percentage: 10 },
-  { id: 'prazeres', name: 'Prazeres', color: '#d946ef', percentage: 10 },
-  { id: 'liberdade', name: 'Liberdade financeira', color: '#60a5fa', percentage: 25 },
-  { id: 'conhecimento', name: 'Conhecimento', color: '#fb923c', percentage: 5 },
+  { id: 'custos-fixos', name: 'Custos fixos', color: '#4a90e2', percentage: 35, subcategories: [] },
+  { id: 'conforto', name: 'Conforto', color: '#00d4aa', percentage: 15, subcategories: [] },
+  { id: 'metas', name: 'Metas', color: '#f5d547', percentage: 10, subcategories: [] },
+  { id: 'prazeres', name: 'Prazeres', color: '#d946ef', percentage: 10, subcategories: [] },
+  { id: 'liberdade', name: 'Liberdade financeira', color: '#60a5fa', percentage: 25, subcategories: [] },
+  { id: 'conhecimento', name: 'Conhecimento', color: '#fb923c', percentage: 5, subcategories: [] },
 ]
 
 export const FinanceProvider = ({ children }) => {
@@ -94,10 +94,15 @@ export const FinanceProvider = ({ children }) => {
     const manualSpent = currentData.manualCategorySpent || {}
     
     categoriesGoals.forEach(cat => {
-      // Use manual value if set, otherwise calculate from expenses
-      spent[cat.id] = manualSpent[cat.id] !== undefined 
-        ? manualSpent[cat.id]
-        : calculateTotalSpent(expenses, cat.id)
+      // If category has subcategories, sum them
+      if (cat.subcategories && cat.subcategories.length > 0) {
+        spent[cat.id] = cat.subcategories.reduce((sum, sub) => sum + (sub.value || 0), 0)
+      } else {
+        // Otherwise use manual value if set, or calculate from expenses
+        spent[cat.id] = manualSpent[cat.id] !== undefined 
+          ? manualSpent[cat.id]
+          : calculateTotalSpent(expenses, cat.id)
+      }
     })
     return spent
   }, [expenses, categoriesGoals, currentData.manualCategorySpent])
@@ -347,6 +352,49 @@ export const FinanceProvider = ({ children }) => {
     }
   }
   
+  // Subcategory management functions
+  const addSubcategory = (categoryId, subcategoryData) => {
+    setCategoriesGoals(prev => prev.map(cat => 
+      cat.id === categoryId 
+        ? { 
+            ...cat, 
+            subcategories: [
+              ...(cat.subcategories || []), 
+              {
+                id: `sub_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+                name: subcategoryData.name,
+                value: subcategoryData.value || 0
+              }
+            ]
+          }
+        : cat
+    ))
+  }
+
+  const updateSubcategory = (categoryId, subcategoryId, updates) => {
+    setCategoriesGoals(prev => prev.map(cat =>
+      cat.id === categoryId
+        ? {
+            ...cat,
+            subcategories: (cat.subcategories || []).map(sub =>
+              sub.id === subcategoryId ? { ...sub, ...updates } : sub
+            )
+          }
+        : cat
+    ))
+  }
+
+  const removeSubcategory = (categoryId, subcategoryId) => {
+    setCategoriesGoals(prev => prev.map(cat =>
+      cat.id === categoryId
+        ? {
+            ...cat,
+            subcategories: (cat.subcategories || []).filter(sub => sub.id !== subcategoryId)
+          }
+        : cat
+    ))
+  }
+  
   const exportData = (format) => {
     const exportDataObj = {
       monthlyIncome,
@@ -439,6 +487,9 @@ export const FinanceProvider = ({ children }) => {
     removeDebt,
     toggleDebtPaid,
     resetAll,
+    addSubcategory,
+    updateSubcategory,
+    removeSubcategory,
     exportData,
     importData,
     setUserName,
