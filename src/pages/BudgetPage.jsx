@@ -11,6 +11,8 @@ import DebtModal from '../components/DebtModal'
 import ConfirmModal from '../components/ConfirmModal'
 import SubcategoryModal from '../components/SubcategoryModal'
 import SubcategoryRow from '../components/SubcategoryRow'
+import CategoryManagerModal from '../components/CategoryManagerModal'
+import GoalsSection from '../components/GoalsSection'
 import './BudgetPage.css'
 
 const BudgetPage = () => {
@@ -101,6 +103,8 @@ const BudgetPage = () => {
   const [selectedCategory, setSelectedCategory] = useState(null)
   const [expandedCategories, setExpandedCategories] = useState({})
   
+  const [isCategoryManagerOpen, setIsCategoryManagerOpen] = useState(false)
+  
   // Debt handlers
   const handleAddDebt = () => {
     setEditingDebt(null)
@@ -174,7 +178,16 @@ const BudgetPage = () => {
       <Header />
       
       <main className="page-content">
-        <MonthSelector />
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+          <MonthSelector />
+          <button 
+            className="btn-secondary" 
+            onClick={() => setIsCategoryManagerOpen(true)}
+            style={{ fontSize: '0.9rem', padding: '0.5rem 1rem' }}
+          >
+            ⚙️ Gerenciar Categorias
+          </button>
+        </div>
         
         {/* Layout Principal: 2 Colunas */}
         <div className="budget-layout">
@@ -360,6 +373,9 @@ const BudgetPage = () => {
               )}
             </div>
             
+            {/* Financial Goals Section */}
+            <GoalsSection />
+
             {/* Dívidas */}
             <div className="budget-section debts-section">
               <div className="section-header">
@@ -534,6 +550,7 @@ const BudgetPage = () => {
           </div>
         </section>
         
+        
         {/* Investment Modal */}
         <InvestmentModal
           isOpen={isModalOpen}
@@ -574,6 +591,11 @@ const BudgetPage = () => {
           onClose={() => setIsSubcategoryModalOpen(false)}
           onSave={handleSaveSubcategory}
           categoryName={selectedCategory?.name || ''}
+        />
+        
+        <CategoryManagerModal 
+          isOpen={isCategoryManagerOpen}
+          onClose={() => setIsCategoryManagerOpen(false)}
         />
       </main>
     </div>

@@ -44,6 +44,11 @@ export const FinanceProvider = ({ children }) => {
   const [monthlyData, setMonthlyData] = useState(() => 
     loadData('monthlyData', {})
   )
+
+  // Financial Goals (Phase 2)
+  const [financialGoals, setFinancialGoals] = useState(() => 
+    loadData('financialGoals', [])
+  )
   
   // Get current month key
   const currentMonthKey = useMemo(() => getMonthKey(selectedMonth), [selectedMonth])
@@ -86,6 +91,10 @@ export const FinanceProvider = ({ children }) => {
   useEffect(() => {
     saveData('monthlyData', monthlyData)
   }, [monthlyData])
+
+  useEffect(() => {
+    saveData('financialGoals', financialGoals)
+  }, [financialGoals])
   
   
   // Computed values
@@ -352,6 +361,101 @@ export const FinanceProvider = ({ children }) => {
     }
   }
   
+  // Category Management Functions (Phase 1)
+  const addCategory = (categoryData) => {
+    const newCategory = {
+      id: `cat_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      name: categoryData.name,
+      color: categoryData.color,
+      percentage: Number(categoryData.percentage),
+      subcategories: [], // Initialize empty subcategories
+      isArchived: false,
+      isCustom: true
+    }
+    
+    setCategoriesGoals(prev => [...prev, newCategory])
+    return { success: true, id: newCategory.id }
+  }
+
+  const updateCategory = (categoryId, updates) => {
+    setCategoriesGoals(prev => prev.map(cat => 
+      cat.id === categoryId ? { ...cat, ...updates } : cat
+    ))
+    return { success: true }
+  }
+
+  const deleteCategory = (categoryId) => {
+    // Check if category has any historical usage (spent > 0 in any month)
+    // This requires checking all monthlyData snapshots
+    const hasHistory = Object.values(monthlyData).some(monthData => {
+      // Check expenses
+      const hasExpenses = (monthData.expenses || []).some(exp => exp.categoryId === categoryId)
+      // Check manual spent
+      const hasManual = (monthData.manualCategorySpent || {})[categoryId] > 0
+      // Check snapshot
+      const hasSnapshot = (monthData.snapshotSpent || {})[categoryId] > 0
+      
+      return hasExpenses || hasManual || hasSnapshot
+    })
+
+    const category = categoriesGoals.find(c => c.id === categoryId)
+    if (category) {
+      // Check subcategories usage
+      const hasSubcategories = category.subcategories && category.subcategories.length > 0 && category.subcategories.some(sub => sub.value > 0);
+      if (hasSubcategories) {
+         return { success: false, error: 'Esta categoria possui subcategorias com valores definidos e não pode ser excluída.' }
+      }
+    }
+
+    if (hasHistory) {
+      return { success: false, error: 'Esta categoria possui histórico financeiro e não pode ser excluída.' }
+    }
+
+    setCategoriesGoals(prev => prev.filter(cat => cat.id !== categoryId))
+    return { success: true }
+  }
+
+  const validateBudgetTotal = (newCategoryPercentage, excludeCategoryId = null) => {
+    const currentTotal = categoriesGoals
+      .filter(cat => cat.id !== excludeCategoryId)
+      .reduce((sum, cat) => sum + (cat.percentage || 0), 0)
+    
+    return (currentTotal + newCategoryPercentage) <= 100
+  }
+
+  // Financial Goals Management (Phase 2)
+  const addGoal = (goalData) => {
+    const newGoal = {
+      id: `goal_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      name: goalData.name,
+      targetAmount: Number(goalData.targetAmount),
+      currentAmount: Number(goalData.currentAmount || 0),
+      createdAt: new Date().toISOString()
+    }
+
+    setFinancialGoals(prev => [...prev, newGoal])
+    return { success: true, id: newGoal.id }
+  }
+
+  const updateGoal = (goalId, updates) => {
+    setFinancialGoals(prev => prev.map(goal => 
+      goal.id === goalId 
+        ? { 
+            ...goal, 
+            ...updates, 
+            targetAmount: updates.targetAmount !== undefined ? Number(updates.targetAmount) : goal.targetAmount,
+            currentAmount: updates.currentAmount !== undefined ? Number(updates.currentAmount) : goal.currentAmount
+          } 
+        : goal
+    ))
+    return { success: true }
+  }
+
+  const deleteGoal = (goalId) => {
+    setFinancialGoals(prev => prev.filter(goal => goal.id !== goalId))
+    return { success: true }
+  }
+
   // Subcategory management functions
   const addSubcategory = (categoryId, subcategoryData) => {
     setCategoriesGoals(prev => prev.map(cat => 
@@ -397,25 +501,37 @@ export const FinanceProvider = ({ children }) => {
     ))
   }
   
-  // Persist current month's calculated category spent to snapshot
-  // This ensures that even if subcategories change later, we have a record of what was spent this month
+  // Persist current month's calculated category spent AND names to snapshot
   useEffect(() => {
     if (currentMonthKey && categorySpent) {
-      const hasChanges = Object.keys(categorySpent).some(
-        key => categorySpent[key] !== (currentData.snapshotSpent?.[key])
+      const currentSnapshotSpent = currentData.snapshotSpent || {}
+      const currentSnapshotNames = currentData.snapshotCategoryNames || {}
+      
+      const hasSpentChanges = Object.keys(categorySpent).some(
+        key => categorySpent[key] !== currentSnapshotSpent[key]
       )
       
-      if (hasChanges) {
+      // Check if names need updating (if not present)
+      const hasNameChanges = categoriesGoals.some(cat => currentSnapshotNames[cat.id] !== cat.name)
+
+      if (hasSpentChanges || hasNameChanges) {
+        // Create map of current category names
+        const categoryNames = {}
+        categoriesGoals.forEach(cat => {
+          categoryNames[cat.id] = cat.name
+        })
+
         setMonthlyData(prev => ({
           ...prev,
           [currentMonthKey]: {
             ...prev[currentMonthKey],
-            snapshotSpent: categorySpent
+            snapshotSpent: categorySpent,
+            snapshotCategoryNames: { ...currentSnapshotNames, ...categoryNames }
           }
         }))
       }
     }
-  }, [categorySpent, currentMonthKey, currentData])
+  }, [categorySpent, currentMonthKey, currentData, categoriesGoals])
 
   const exportData = (format) => {
     const exportDataObj = {
@@ -446,7 +562,8 @@ export const FinanceProvider = ({ children }) => {
           theme,
           userName,
           categoriesGoals,
-          monthlyData
+          monthlyData,
+          financialGoals
         })
         break
       default:
@@ -462,6 +579,7 @@ export const FinanceProvider = ({ children }) => {
       if (data.userName) setUserName(data.userName)
       if (data.categoriesGoals) setCategoriesGoals(data.categoriesGoals)
       if (data.monthlyData) setMonthlyData(data.monthlyData)
+      if (data.financialGoals) setFinancialGoals(data.financialGoals)
       
       return { success: true }
     } catch (error) {
@@ -480,6 +598,7 @@ export const FinanceProvider = ({ children }) => {
     expenses,
     investments,
     debts,
+    financialGoals,
     
     // Computed values
     categorySpent,
@@ -510,9 +629,17 @@ export const FinanceProvider = ({ children }) => {
     removeDebt,
     toggleDebtPaid,
     resetAll,
+    resetAll,
     addSubcategory,
     updateSubcategory,
     removeSubcategory,
+    addCategory,
+    updateCategory,
+    deleteCategory,
+    addGoal,
+    updateGoal,
+    deleteGoal,
+    validateBudgetTotal,
     exportData,
     importData,
     setUserName,

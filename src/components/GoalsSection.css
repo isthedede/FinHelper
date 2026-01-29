@@ -1,0 +1,165 @@
+.financial-goals-section .section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.goals-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1rem;
+}
+
+.goal-card {
+  background: var(--bg-secondary);
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
+  border: 1px solid var(--border-color);
+  transition: transform 0.2s;
+}
+
+.goal-card:hover {
+  transform: translateY(-2px);
+}
+
+.goal-card.completed {
+  border-color: var(--success-color);
+  background: linear-gradient(to bottom right, var(--bg-secondary), rgba(16, 185, 129, 0.05));
+}
+
+.goal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.goal-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: var(--text-primary);
+}
+
+.goal-actions {
+  display: flex;
+  gap: 0.5rem;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+}
+
+.goal-card:hover .goal-actions {
+  opacity: 1;
+}
+
+.goal-actions button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 0.2rem;
+  opacity: 0.7;
+}
+
+.goal-actions button:hover {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+.goal-progress-container {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.goal-progress-bar {
+  flex: 1;
+  height: 8px;
+  background: var(--bg-tertiary);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.goal-progress-fill {
+  height: 100%;
+  background: var(--primary-color);
+  border-radius: 4px;
+  transition: width 0.5s ease-out;
+}
+
+.goal-card.completed .goal-progress-fill {
+  background: var(--success-color);
+}
+
+.goal-percentage {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  min-width: 35px;
+  text-align: right;
+}
+
+.goal-details {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.9rem;
+}
+
+.goal-values {
+  display: flex;
+  align-items: baseline;
+  gap: 0.3rem;
+}
+
+.goal-values .current {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.goal-values .separator {
+  color: var(--text-tertiary);
+}
+
+.goal-values .target {
+  color: var(--text-tertiary);
+}
+
+.goal-remaining {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+
+.goal-status-badge {
+  background: rgba(16, 185, 129, 0.15);
+  color: var(--success-color);
+  padding: 0.2rem 0.6rem;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.empty-goals {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 3rem;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-md);
+  border: 1px dashed var(--border-color);
+}
+
+.empty-goals p {
+  color: var(--text-secondary);
+  margin-bottom: 1rem;
+}
+
+.empty-goals button {
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-weight: 500;
+}

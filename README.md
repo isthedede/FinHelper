@@ -204,13 +204,6 @@ Data is automatically saved in the browser's localStorage. This means:
 This project is licensed under the MIT License. See the LICENSE file for details.
 
 ## Future Roadmap
-
-- Monthly evolution charts
-- Customizable categories
-- Specific financial goals (e.g., "Save $5,000 for vacation")
-- Bank statement import (CSV/OFX)
-- Month-to-month comparison mode
-
 ---
 
 **Developed with React and Vite**
