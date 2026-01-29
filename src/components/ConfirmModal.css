@@ -1,0 +1,25 @@
+/* Confirm Modal - Simpler styling */
+.confirm-modal {
+  max-width: 400px;
+}
+
+.confirm-modal .modal-body {
+  padding: var(--spacing-md) 0;
+  color: var(--text-secondary);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+}
+
+.confirm-modal .modal-body p {
+  margin: 0;
+}
+
+.btn-danger {
+  background: var(--danger);
+  color: white;
+}
+
+.btn-danger:hover {
+  background: #c92a2a;
+  transform: translateY(-1px);
+}

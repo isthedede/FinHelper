@@ -1,0 +1,842 @@
+.budget-page {
+  min-height: 100vh;
+  background: var(--bg-primary);
+}
+
+.page-content {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: var(--spacing-xs) var(--spacing-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm); /* 16px instead of 32px */
+}
+
+/* Budget Layout - 2 Columns: Left (Resumo + Investments) + Right (Metas) */
+.budget-layout {
+  display: grid;
+  grid-template-columns: 1fr 360px; /* Left column flexible, Metas fixed */
+  gap: var(--spacing-md);
+  align-items: start;
+  min-height: 0;
+}
+
+/* Left column stacks Resumo + Investments */
+.left-column {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  min-height: 0;
+}
+
+.budget-section {
+  background: var(--bg-secondary);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-sm);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow var(--transition-fast);
+  display: flex;
+  flex-direction: column;
+  height: auto; /* Auto height to fit content */
+  overflow: visible; /* Allow content to flow */
+  min-height: 0;
+}
+
+/* Goals section needs extra padding */
+.goals-section {
+  padding: var(--spacing-md); /* 24px padding */
+  padding-bottom: var(--spacing-lg); /* 32px bottom for breathing room */
+  overflow: visible !important; /* Ensure all categories show */
+}
+
+.budget-section:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.budget-section h2 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-sm) 0; /* Normalized margins */
+  flex-shrink: 0;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-sm);
+  flex-shrink: 0;
+}
+
+.section-header h2 {
+  margin: 0;
+}
+
+/* Summary Section - NO SCROLL */
+.summary-section {
+  overflow: visible; /* Remove scroll */
+}
+
+.summary-table {
+  font-size: 0.875rem;
+  overflow: visible;
+}
+
+/* Expenses Section */
+.btn-add {
+  background: var(--accent-primary);
+  color: var(--text-primary);
+  padding: 6px var(--spacing-sm);
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  font-size: 0.8rem;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.btn-add:hover {
+  background: var(--accent-secondary);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.expenses-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  max-height: 400px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.empty-state {
+  text-align: center;
+  padding: var(--spacing-xl);
+  color: var(--text-muted);
+}
+
+.empty-state p {
+  margin-bottom: var(--spacing-md);
+  font-size: 0.875rem;
+}
+
+.category-legend {
+  border-top: 1px solid var(--border-color);
+  padding-top: var(--spacing-md);
+  margin-top: var(--spacing-md);
+}
+
+.category-legend h4 {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-sm);
+  margin-bottom: 4px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.legend-item:hover {
+  background: var(--bg-tertiary);
+}
+
+.legend-item.active {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--accent-primary);
+}
+
+.legend-color {
+  width: 12px;
+  height: 12px;
+  border-radius: var(--radius-full);
+  flex-shrink: 0;
+}
+
+.legend-name {
+  flex: 1;
+  font-size: 0.875rem;
+  color: var(--text-primary);
+}
+
+.legend-value {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.total-expenses {
+  display: flex;
+  justify-content: space-between;
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-sm);
+  font-weight: 700;
+  font-size: 1.125rem;
+  margin-top: var(--spacing-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.total-value {
+  color: var(--accent-primary);
+}
+
+/* Summary Section */
+.summary-table {
+  font-size: 0.8125rem; /* Smaller font */
+}
+
+.table-header,
+.table-row {
+  display: grid;
+  grid-template-columns: minmax(160px, 1.8fr) 1fr 1fr 0.8fr 0.7fr;
+  align-items: center;
+  padding: 6px 0; /* Compact padding */
+  gap: var(--spacing-xs); /* Smaller gap */
+}
+
+.table-header {
+  font-weight: 600;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: var(--spacing-xs);
+  margin-bottom: 4px; /* Tighter margin */
+  font-size: 0.6875rem; /* Smaller header */
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.table-header > div {
+  padding: 0 var(--spacing-xs);
+}
+
+.table-header > div:first-child {
+  text-align: left;
+  padding-left: 0;
+}
+
+.table-header > div:not(:first-child) {
+  text-align: right;
+}
+
+.table-row {
+  transition: all var(--transition-fast);
+  border-radius: var(--radius-sm);
+}
+
+.table-row:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.table-row.status-ok {
+  color: var(--text-primary);
+}
+
+.table-row.status-warning {
+  color: var(--warning);
+}
+
+.table-row.status-danger {
+  color: var(--danger);
+}
+
+.table-row > div {
+  padding: var(--spacing-xs);
+}
+
+.table-row > div:first-child {
+  text-align: left;
+  padding-left: 0;
+}
+
+.table-row > div:not(:first-child) {
+  text-align: right;
+  font-weight: 500;
+}
+
+.row-label {
+  display: flex;
+  align-items: center;
+  gap: 6px; /* Tighter gap */
+  font-weight: 500;
+  font-size: 0.875rem;
+}
+
+.cat-color {
+  width: 8px; /* Smaller */
+  height: 8px;
+  border-radius: var(--radius-full);
+  flex-shrink: 0;
+}
+
+.utilization {
+  font-weight: 600;
+}
+
+.table-footer {
+  margin-top: var(--spacing-sm); /* Reduced */
+  padding-top: var(--spacing-sm);
+  border-top: 2px solid var(--border-color);
+  font-weight: 700;
+  font-size: 1rem;
+  display: flex;
+  gap: var(--spacing-lg);
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.table-footer > div:first-child {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.footer-summary {
+  display: flex;
+  gap: var(--spacing-lg);
+  align-items: center;
+  flex: 1;
+}
+
+.footer-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.footer-label {
+  font-size: 0.6875rem; /* Smaller */
+  color: var(--text-muted);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.footer-value {
+  font-size: 1.125rem; /* Reduced */
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.footer-spent {
+  color: var(--success);
+}
+
+.footer-remaining {
+  color: var(--danger);
+}
+
+.footer-utilization {
+  color: var(--text-primary);
+}
+
+/* Goals Section */
+.goals-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md); /* 24px gap between items */
+  padding-bottom: var(--spacing-sm); /* 16px bottom breathing room */
+  overflow: visible; /* No scroll */
+  min-height: 0;
+}
+
+.goal-item {
+  padding: var(--spacing-sm); /* 16px padding */
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-md); /* 12px radius */
+  border: 1px solid var(--border-color);
+  transition: all var(--transition-fast);
+}
+
+.goal-item:hover {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: var(--accent-primary);
+}
+
+.goal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-xs);
+}
+
+.goal-name {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.goal-percentage {
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--accent-primary);
+}
+
+.goal-percentage.over-budget {
+  color: var(--danger);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.goal-progress-bar {
+  width: 100%;
+  height: 8px;
+  background: var(--bg-primary);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  margin-bottom: var(--spacing-xs);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.goal-progress-fill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  transition: width var(--transition-base);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.goal-progress-fill.over-budget {
+  background: var(--danger);
+}
+
+.goal-footer {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.over-budget-badge {
+  font-size: 0.625rem;
+  color: var(--danger);
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-top: 4px;
+  text-align: center;
+  letter-spacing: 0.5px;
+}
+
+/* Overview Section - Below the Fold */
+.overview-section {
+  margin-top: var(--spacing-xl);
+  padding-top: var(--spacing-xl);
+  border-top: 1px solid var(--border-color);
+}
+
+.overview-section h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-md);
+}
+
+/* Dashboard Metrics - In Overview Section */
+.dashboard-metrics {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: var(--spacing-sm);
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+  .budget-layout {
+    grid-template-columns: minmax(600px, 1fr) 340px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .budget-layout {
+    grid-template-columns: 1fr;
+    height: auto;
+  }
+  
+  .dashboard-metrics {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .page-content {
+    padding: var(--spacing-xs) var(--spacing-sm);
+  }
+  
+  .budget-section {
+    padding: var(--spacing-sm);
+  }
+  
+  .budget-section h2 {
+    font-size: 1.125rem;
+  }
+  
+  .table-header,
+  .table-row {
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: var(--spacing-xs);
+    font-size: 0.75rem;
+  }
+  
+  .table-header > div:nth-child(n+4),
+  .table-row > div:nth-child(n+4) {
+    display: none;
+  }
+  
+  .table-footer {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    align-items: flex-start;
+  }
+  
+  .footer-summary {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    align-items: flex-start;
+    width: 100%;
+  }
+  
+  .dashboard-metrics {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ============================================
+   INVESTMENTS SECTION - LIBERDADE FINANCEIRA
+   ============================================ */
+
+.investments-section {
+  min-height: 200px;
+  max-height: 400px;
+}
+
+.investments-section .section-header {
+  margin-bottom: var(--spacing-sm);
+}
+
+.investments-section .btn-sm {
+  font-size: 0.8125rem;
+  padding: 6px 12px;
+}
+
+/* Empty state */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-lg);
+  text-align: center;
+  color: var(--text-muted);
+  min-height: 150px;
+}
+
+.empty-state p {
+  margin: 0;
+  font-size: 0.875rem;
+}
+
+/* Investments table */
+.investments-table {
+  font-size: 0.8125rem;
+  overflow: visible;
+}
+
+.investments-table .table-header,
+.investments-table .table-row {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 0.8fr auto;
+  align-items: center;
+  padding: 6px 0;
+  gap: var(--spacing-xs);
+}
+
+.investments-table .table-header {
+  font-weight: 600;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: var(--spacing-xs);
+  margin-bottom: 4px;
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.investments-table .table-row {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  transition: background-color var(--transition-fast);
+}
+
+.investments-table .table-row:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+/* Investment actions */
+.investment-actions {
+  display: flex;
+  gap: 4px;
+  justify-content: flex-end;
+}
+
+.investment-actions button {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-fast);
+  font-size: 0.875rem;
+}
+
+.investment-actions button:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-primary);
+}
+
+.investment-actions .btn-delete:hover {
+  color: var(--danger);
+}
+
+/* Investments list with scroll */
+.investments-list {
+  min-height: 0;
+  max-height: 280px;
+  overflow-y: auto;
+  padding-bottom: var(--spacing-sm);
+}
+
+/* Investments footer */
+.investments-footer {
+  margin-top: var(--spacing-sm);
+  padding-top: var(--spacing-sm);
+  border-top: 2px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.investments-footer .footer-label {
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.investments-footer .footer-value {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--accent-primary);
+}
+
+/* ============================================
+   DEBTS SECTION - DÍVIDAS
+   ============================================ */
+
+.debts-section {
+  min-height: 200px;
+  max-height: 400px;
+}
+
+.debts-section .section-header {
+  margin-bottom: var(--spacing-sm);
+}
+
+/* Debts table */
+.debts-table {
+  font-size: 0.8125rem;
+  overflow: visible;
+}
+
+.debts-table .table-header,
+.debts-table .table-row {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1fr 1.2fr auto;
+  align-items: center;
+  padding: 6px 0;
+  gap: var(--spacing-xs);
+}
+
+.debts-table .table-header {
+  font-weight: 600;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: var(--spacing-xs);
+  margin-bottom: 4px;
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.debts-table .table-row {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  transition: background-color var(--transition-fast);
+}
+
+.debts-table .table-row:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.debts-table .table-row.paid {
+  opacity: 0.6;
+}
+
+/* Debt status toggle */
+.debt-status-toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  cursor: pointer;
+}
+
+.debt-status-toggle input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: var(--success);
+}
+
+.status-badge {
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.status-badge.paid {
+  background: rgba(0, 212, 170, 0.2);
+  color: var(--success);
+}
+
+.status-badge.pending {
+  background: rgba(245, 213, 71, 0.2);
+  color: var(--warning);
+}
+
+.status-badge.overdue {
+  background: rgba(231, 76, 60, 0.2);
+  color: var(--danger);
+}
+
+/* Debt actions */
+.debt-actions {
+  display: flex;
+  gap: 4px;
+  justify-content: flex-end;
+}
+
+.debt-actions button {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-fast);
+  font-size: 0.875rem;
+}
+
+.debt-actions button:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-primary);
+}
+
+.debt-actions .btn-delete:hover {
+  color: var(--danger);
+}
+
+/* Debts list with scroll */
+.debts-list {
+  min-height: 0;
+  max-height: 280px;
+  overflow-y: auto;
+  padding-bottom: var(--spacing-sm);
+}
+
+/* Debts footer */
+.debts-footer {
+  margin-top: var(--spacing-sm);
+  padding-top: var(--spacing-sm);
+  border-top: 2px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.footer-stats {
+  display: flex;
+  gap: var(--spacing-lg);
+  align-items: center;
+}
+
+.footer-stat {
+  display: flex;
+  gap: var(--spacing-xs);
+  align-items: center;
+  font-size: 0.875rem;
+}
+
+.footer-stat .stat-label {
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.footer-stat .stat-value {
+  font-weight: 700;
+}
+
+.footer-stat .stat-value.paid {
+  color: var(--success);
+}
+
+.footer-stat .stat-value.pending {
+  color: var(--warning);
+}
+
+.footer-total {
+  display: flex;
+  gap: var(--spacing-sm);
+  align-items: center;
+}
+
+.footer-total .footer-label {
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.footer-total .footer-value {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--accent-primary);
+}
+
+/* Non-editable cell for Liberdade financeira */
+.non-editable-cell {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  font-weight: 600;
+  color: var(--text-primary);
+  text-align: left;
+}

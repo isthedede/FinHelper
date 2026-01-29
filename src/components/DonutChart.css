@@ -1,0 +1,20 @@
+.donut-chart-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: var(--spacing-lg) 0;
+}
+
+.empty-chart {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 300px;
+  padding: var(--spacing-xl);
+  text-align: center;
+}
+
+.empty-chart p {
+  color: var(--text-muted);
+  font-size: 0.875rem;
+}
