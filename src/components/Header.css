@@ -12,9 +12,24 @@
   min-height: 64px;
 }
 
+.header-logo-container {
+  display: flex;
+  align-items: center;
+}
+
+.header-logo {
+  height: 48px;
+  width: auto;
+  transition: transform 0.2s;
+}
+
+.header-logo:hover {
+  transform: scale(1.05);
+}
+
 .header-nav {
   display: flex;
-  gap: var(--spacing-lg);
+  gap: var(--spacing-md); /* Reduced gap to prevent overlap */
 }
 
 .nav-link {

@@ -64,7 +64,7 @@ export const FinanceProvider = ({ children }) => {
   }, [monthlyData, currentMonthKey])
   
   const monthlyIncome = currentData.income
-  const expenses = currentData.expenses
+  const expenses = currentData.expenses || []
   
   // Apply theme to document
   useEffect(() => {
@@ -628,7 +628,6 @@ export const FinanceProvider = ({ children }) => {
     updateDebt,
     removeDebt,
     toggleDebtPaid,
-    resetAll,
     resetAll,
     addSubcategory,
     updateSubcategory,
