@@ -37,7 +37,11 @@ const Header = () => {
     <header className="header">
       <div className="header-logo-container">
         <Link to="/">
-          <img src="/FinHelper_Logo.png" alt="FinHelper" className="header-logo" />
+          <img 
+            src={`${import.meta.env.BASE_URL}FinHelper_Logo.png`} 
+            alt="FinHelper" 
+            className="header-logo" 
+          />
         </Link>
       </div>
       <nav className="header-nav">
