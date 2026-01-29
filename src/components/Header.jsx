@@ -1,3 +1,4 @@
+import { useState, useRef } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { useFinance } from '../context/FinanceContext'
 import './Header.css'
@@ -46,6 +47,12 @@ const Header = () => {
           className={`nav-link ${location.pathname === '/goals' ? 'active' : ''}`}
         >
           MINHAS METAS
+        </Link>
+        <Link 
+          to="/evolution" 
+          className={`nav-link ${location.pathname === '/evolution' ? 'active' : ''}`}
+        >
+          EVOLUÇÃO
         </Link>
       </nav>
       
@@ -115,8 +122,5 @@ const Header = () => {
     </header>
   )
 }
-
-// Add missing imports
-import { useState, useRef } from 'react'
 
 export default Header

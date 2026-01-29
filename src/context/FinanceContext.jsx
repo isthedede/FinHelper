@@ -96,11 +96,11 @@ export const FinanceProvider = ({ children }) => {
     categoriesGoals.forEach(cat => {
       // If category has subcategories, sum them
       if (cat.subcategories && cat.subcategories.length > 0) {
-        spent[cat.id] = cat.subcategories.reduce((sum, sub) => sum + (sub.value || 0), 0)
+        spent[cat.id] = cat.subcategories.reduce((sum, sub) => sum + Number(sub.value || 0), 0)
       } else {
         // Otherwise use manual value if set, or calculate from expenses
         spent[cat.id] = manualSpent[cat.id] !== undefined 
-          ? manualSpent[cat.id]
+          ? Number(manualSpent[cat.id])
           : calculateTotalSpent(expenses, cat.id)
       }
     })
@@ -363,7 +363,7 @@ export const FinanceProvider = ({ children }) => {
               {
                 id: `sub_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
                 name: subcategoryData.name,
-                value: subcategoryData.value || 0
+                value: Number(subcategoryData.value || 0)
               }
             ]
           }
@@ -377,7 +377,9 @@ export const FinanceProvider = ({ children }) => {
         ? {
             ...cat,
             subcategories: (cat.subcategories || []).map(sub =>
-              sub.id === subcategoryId ? { ...sub, ...updates } : sub
+              sub.id === subcategoryId 
+                ? { ...sub, ...updates, value: updates.value !== undefined ? Number(updates.value) : sub.value } 
+                : sub
             )
           }
         : cat
@@ -395,6 +397,26 @@ export const FinanceProvider = ({ children }) => {
     ))
   }
   
+  // Persist current month's calculated category spent to snapshot
+  // This ensures that even if subcategories change later, we have a record of what was spent this month
+  useEffect(() => {
+    if (currentMonthKey && categorySpent) {
+      const hasChanges = Object.keys(categorySpent).some(
+        key => categorySpent[key] !== (currentData.snapshotSpent?.[key])
+      )
+      
+      if (hasChanges) {
+        setMonthlyData(prev => ({
+          ...prev,
+          [currentMonthKey]: {
+            ...prev[currentMonthKey],
+            snapshotSpent: categorySpent
+          }
+        }))
+      }
+    }
+  }, [categorySpent, currentMonthKey, currentData])
+
   const exportData = (format) => {
     const exportDataObj = {
       monthlyIncome,
@@ -452,6 +474,7 @@ export const FinanceProvider = ({ children }) => {
     theme,
     userName,
     selectedMonth,
+    monthlyData,
     monthlyIncome,
     categoriesGoals,
     expenses,

@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { FinanceProvider, useFinance } from './context/FinanceContext'
 import BudgetPage from './pages/BudgetPage'
 import GoalsPage from './pages/GoalsPage'
+import EvolutionPage from './pages/EvolutionPage'
 import WelcomeModal from './components/WelcomeModal'
 
 function AppContent() {
@@ -15,6 +16,7 @@ function AppContent() {
         <Routes>
           <Route path="/" element={<BudgetPage />} />
           <Route path="/goals" element={<GoalsPage />} />
+          <Route path="/evolution" element={<EvolutionPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Router>

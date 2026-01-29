@@ -1,0 +1,73 @@
+.comparison-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.comparison-card h4 {
+  margin: 0 0 var(--spacing-md) 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.comparison-values {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+}
+
+.value-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.value-item .label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.value-item .value {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.delta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-sm);
+  border-radius: var(--radius-sm);
+  background: var(--bg-tertiary);
+  font-weight: 600;
+}
+
+.delta.positive {
+  color: var(--success);
+  background: rgba(34, 197, 94, 0.1);
+}
+
+.delta.negative {
+  color: var(--danger);
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.delta.neutral {
+  color: var(--text-muted);
+}
+
+.delta-value {
+  font-size: 1rem;
+}
+
+.delta-percent {
+  font-size: 0.875rem;
+  opacity: 0.8;
+}
